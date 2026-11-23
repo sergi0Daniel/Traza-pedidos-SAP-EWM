@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Seguimiento y trazabilidad de pedidos de grifería dentro del centro de distribución.">
+  <title>TRAZA+ | Trazabilidad de pedidos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">C</div>
+      <div><strong>corona</strong><small>Centro de distribución</small></div>
+    </div>
+    <div class="workspace-label">TRAZABILIDAD LOGÍSTICA</div>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span>Inicio</button>
+      <button class="nav-item" data-page="orders"><span class="nav-icon">▣</span>Seguimiento de pedidos</button>
+      <button class="nav-item" data-page="alerts"><span class="nav-icon">△</span>Alertas y demoras<span class="nav-count" id="navAlertCount">0</span></button>
+      <button class="nav-item" data-page="ai"><span class="nav-icon">✧</span>Informes con IA</button>
+      <button class="nav-item" data-page="connection"><span class="nav-icon">⇄</span>Conexión SAP EWM</button>
+    </nav>
+    <div class="sidebar-note">
+      <span class="note-icon">i</span>
+      <div><strong>Seguimiento interno</strong><p>Consulta el avance del pedido dentro del centro de distribución.</p></div>
+    </div>
+    <div class="sidebar-bottom">
+      <span class="status-dot" id="sidebarDot"></span>
+      <span id="sidebarMode">Modo demostración</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu" aria-label="Abrir menú">☰</button>
+      <div class="breadcrumb">Operaciones <span>/</span> <strong id="breadcrumbCurrent">Inicio</strong></div>
+      <div class="topbar-right">
+        <span class="mode-pill" id="modePill"><span class="status-dot"></span><span>Datos de demostración</span></span>
+        <div class="user-avatar">SP</div>
+        <span class="user-name">Usuario</span>
+      </div>
+    </header>
+
+    <div class="content-wrap">
+      <section class="page active" id="page-dashboard">
+        <div class="page-heading">
+          <div><div class="eyebrow">CENTRO DE DISTRIBUCIÓN · SAP EWM</div><h1>Resumen operativo</h1><p>Monitoreo y seguimiento de pedidos de grifería dentro del centro de distribución.</p></div>
+          <button class="btn btn-outline" data-goto="connection">Ver conexión SAP EWM <span>→</span></button>
+        </div>
+        <div class="demo-banner" id="demoBanner"><span>ⓘ</span><div><strong>Vista de demostración</strong><p>Los pedidos y las cifras que aparecen son ilustrativos. La conexión real con SAP EWM está pendiente de configuración y autorización.</p></div></div>
+        <div class="metric-grid">
+          <article class="metric-card blue"><div class="metric-top"><span>Pedidos activos</span><span class="metric-icon">▣</span></div><strong id="metricActive">—</strong><small>En proceso dentro del almacén</small></article>
+          <article class="metric-card green"><div class="metric-top"><span>Pedidos despachados</span><span class="metric-icon">✓</span></div><strong id="metricShipped">—</strong><small>Con salida registrada</small></article>
+          <article class="metric-card amber"><div class="metric-top"><span>Pedidos con demora</span><span class="metric-icon">!</span></div><strong id="metricDelayed">—</strong><small>Superan el tiempo configurado</small></article>
+          <article class="metric-card navy"><div class="metric-top"><span>En puerta o cargue</span><span class="metric-icon">↗</span></div><strong id="metricLoading">—</strong><small>En fase de despacho</small></article>
+        </div>
+        <div class="dashboard-grid">
+          <article class="panel stage-panel">
+            <div class="panel-heading"><div><h2>Pedidos por etapa</h2><p>Distribución según la etapa actual</p></div><span class="panel-tag">Operación</span></div>
+            <div id="stageBreakdown" class="stage-breakdown"><div class="loading-state">Cargando información…</div></div>
+          </article>
+          <article class="panel attention-panel">
+            <div class="panel-heading"><div><h2>Pedidos que requieren atención</h2><p>Mayores tiempos frente al límite configurado</p></div><button class="text-link" data-goto="alerts">Ver todos</button></div>
+            <div id="attentionList" class="attention-list"><div class="loading-state">Cargando…</div></div>
+          </article>
+        </div>
+        <article class="panel recent-panel">
+          <div class="panel-heading"><div><h2>Pedidos recientes</h2><p>Acceso rápido al detalle de trazabilidad</p></div><button class="btn btn-outline btn-small" data-goto="orders">Ver pedidos</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Etapa actual</th><th>Ubicación registrada</th><th>Tiempo en etapa</th><th>Estado</th><th></th></tr></thead><tbody id="recentOrders"><tr><td colspan="6" class="table-empty">Cargando…</td></tr></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="page" id="page-orders">
+        <div class="page-heading"><div><div class="eyebrow">CONSULTA OPERATIVA</div><h1>Seguimiento de pedidos</h1><p>Busca un pedido y consulta su etapa, ubicación y productos asociados.</p></div></div>
+        <article class="panel search-panel">
+          <form id="orderSearchForm" class="search-form">
+            <label class="search-box"><span>⌕</span><input id="orderSearch" type="search" placeholder="Número de pedido, entrega, referencia o HU" autocomplete="off"></label>
+            <select id="stageFilter" aria-label="Filtrar por etapa"><option value="">Todas las etapas</option><option>Picking</option><option>Empaque</option><option>Zona de despacho</option><option>Puerta de embarque</option><option>Cargue</option><option>Despachado</option></select>
+            <button class="btn btn-primary" type="submit">Buscar pedidos</button>
+          </form>
+          <div class="filter-hint">Puedes buscar por número de pedido, documento de entrega, referencia del producto o identificador HU cuando esté disponible.</div>
+        </article>
+        <article class="panel orders-panel">
+          <div class="panel-heading"><div><h2>Resultados de búsqueda</h2><p id="ordersCount">Pedidos disponibles</p></div><button class="text-link" id="clearFilters">Limpiar filtros</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Entrega</th><th>Etapa actual</th><th>Ubicación registrada</th><th>Tiempo en etapa</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="ordersTable"><tr><td colspan="7" class="table-empty">Cargando pedidos…</td></tr></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="page" id="page-detail">
+        <div class="page-heading detail-heading"><div><button class="back-link" id="backToOrders">← Volver a pedidos</button><div class="eyebrow">DETALLE DE TRAZABILIDAD</div><h1 id="detailTitle">Pedido</h1><p id="detailSubtitle">Consulta de pedido y productos</p></div><span class="status-badge" id="detailStatus">—</span></div>
+        <div id="detailContent"><div class="loading-state">Selecciona un pedido para consultar su detalle.</div></div>
+      </section>
+
+      <section class="page" id="page-alerts">
+        <div class="page-heading"><div><div class="eyebrow">CONTROL DE TIEMPOS</div><h1>Alertas y demoras</h1><p>Pedidos cuyo tiempo en una etapa supera el límite operativo configurado.</p></div></div>
+        <div class="notice-banner" id="alertsNotice">Los tiempos objetivo deben ser definidos y aprobados por Operaciones.</div>
+        <div class="metric-grid compact-metrics">
+          <article class="metric-card red"><div class="metric-top"><span>Demoras identificadas</span><span class="metric-icon">!</span></div><strong id="alertCount">—</strong><small>Pedidos por encima del límite</small></article>
+          <article class="metric-card amber"><div class="metric-top"><span>Etapas involucradas</span><span class="metric-icon">◷</span></div><strong id="alertStages">—</strong><small>Con al menos una alerta</small></article>
+          <article class="metric-card blue"><div class="metric-top"><span>Regla de evaluación</span><span class="metric-icon">⌁</span></div><strong id="thresholdState">—</strong><small>Según configuración disponible</small></article>
+        </div>
+        <article class="panel"><div class="panel-heading"><div><h2>Pedidos para revisión</h2><p>La alerta es informativa; no confirma por sí sola una incidencia física.</p></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Etapa</th><th>Ubicación</th><th>Tiempo actual</th><th>Tiempo límite</th><th>Exceso</th><th></th></tr></thead><tbody id="alertsTable"><tr><td colspan="7" class="table-empty">Cargando alertas…</td></tr></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="page" id="page-ai">
+        <div class="page-heading"><div><div class="eyebrow">ANÁLISIS ASISTIDO</div><h1>Informes con inteligencia artificial</h1><p>Genera resúmenes, consulta información y analiza posibles demoras usando los datos disponibles.</p></div><span class="ai-chip">✧ Asistente IA</span></div>
+        <div class="notice-banner" id="aiNotice">La conexión con el servicio de IA está pendiente de autorización y configuración empresarial.</div>
+        <div class="ai-layout">
+          <article class="panel ai-actions">
+            <h2>¿Qué necesitas analizar?</h2>
+            <p class="panel-description">Selecciona una opción para preparar el análisis.</p>
+            <button class="ai-action active" data-ai-action="report"><span class="ai-action-icon">▤</span><span><strong>Generar informe</strong><small>Resumen de la operación por período</small></span><span class="chevron">›</span></button>
+            <button class="ai-action" data-ai-action="ask"><span class="ai-action-icon">⌕</span><span><strong>Consultar la operación</strong><small>Haz una pregunta sobre los pedidos</small></span><span class="chevron">›</span></button>
+            <button class="ai-action" data-ai-action="delays"><span class="ai-action-icon">◷</span><span><strong>Analizar demoras</strong><small>Revisar etapas y pedidos con alertas</small></span><span class="chevron">›</span></button>
+            <div class="ai-data-note"><strong>Uso de información</strong><p>Los datos solo podrán enviarse al proveedor de IA cuando la empresa autorice expresamente su tratamiento.</p></div>
+          </article>
+          <article class="panel ai-workspace">
+            <div class="ai-workspace-heading"><div><span class="ai-orb">✧</span><div><h2 id="aiWorkspaceTitle">Generar informe</h2><p id="aiWorkspaceSubtitle">Prepara un resumen operativo con los registros disponibles.</p></div></div><span class="panel-tag">Requiere autorización</span></div>
+            <div id="aiReportControls" class="ai-controls">
+              <label>Tipo de informe<select id="reportType"><option value="diario">Resumen de operación diaria</option><option value="semanal">Resumen semanal</option><option value="demoras">Informe de demoras</option><option value="pedido">Seguimiento de un pedido</option></select></label>
+              <button class="btn btn-primary" id="generateReport">✧ Generar informe</button>
+            </div>
+            <div id="aiAskControls" class="ai-controls hidden">
+              <label>Escribe tu pregunta<input id="aiQuestion" type="text" maxlength="500" placeholder="Ej. ¿Qué pedidos llevan más tiempo en empaque?"></label>
+              <button class="btn btn-primary" id="askAI">Enviar pregunta</button>
+            </div>
+            <div id="aiDelayControls" class="ai-controls hidden"><p>El análisis utilizará las alertas calculadas por el sistema y los límites aprobados por Operaciones.</p><button class="btn btn-primary" id="analyzeDelays">✧ Analizar demoras</button></div>
+            <div class="ai-result" id="aiResult"><div class="empty-state"><span class="empty-symbol">✧</span><h3>Tu análisis aparecerá aquí</h3><p>Selecciona una función para comenzar. Los resultados deben revisarse antes de utilizarlos como informe operativo.</p></div></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="page-connection">
+        <div class="page-heading"><div><div class="eyebrow">FUENTE PRINCIPAL DE INFORMACIÓN</div><h1>Conexión SAP EWM</h1><p>Estado de la integración y opciones de consulta de solo lectura.</p></div></div>
+        <article class="panel connection-main">
+          <div class="connection-header"><div class="sap-mark">SAP</div><div><h2>SAP TM - EWM PRD</h2><p>Entorno identificado durante la revisión en SAP GUI: PS4 · mandante 100 · almacén MD01.</p></div><span class="status-badge neutral" id="ewmStatusBadge">Pendiente</span></div>
+          <div class="connection-details"><div><span>Sistema</span><strong>PS4</strong></div><div><span>Mandante</span><strong>100</strong></div><div><span>Almacén</span><strong>MD01</strong></div><div><span>Tipo de acceso</span><strong>Consulta de solo lectura</strong></div></div>
+          <div class="connection-message" id="ewmMessage">La aplicación utiliza información de demostración. Para conectar SAP EWM, TI debe proporcionar el endpoint autorizado, el mecanismo de autenticación y el formato de respuesta.</div>
+          <div class="connection-buttons"><button class="btn btn-outline" id="checkEwm">Verificar conexión</button><button class="btn btn-primary" id="refreshEwm">Consultar pedidos de SAP EWM</button></div>
+          <div id="ewmFeedback" class="feedback" role="status"></div>
+        </article>
+        <article class="panel integration-steps"><h2>Información requerida para habilitar la conexión</h2><div class="requirements-grid"><div><span class="step-number">01</span><strong>Endpoint autorizado</strong><p>Dirección del servicio REST u OData definida por TI.</p></div><div><span class="step-number">02</span><strong>Autenticación</strong><p>Usuario técnico o mecanismo de autenticación aprobado.</p></div><div><span class="step-number">03</span><strong>Formato de datos</strong><p>Campos de pedido, posiciones, tareas, HU, eventos y ubicaciones.</p></div><div><span class="step-number">04</span><strong>Prueba controlada</strong><p>Validar un pedido autorizado y contrastar la respuesta con SAP EWM.</p></div></div></article>
+        <div class="security-note">Por seguridad, las credenciales se configuran en el entorno del servidor. No se introducen contraseñas ni tokens en esta pantalla o en el navegador.</div>
+      </section>
+    </div>
+    <footer class="footer"><span>TRAZA+ · Seguimiento de pedidos de grifería</span><span id="footerDataMode">Entorno de demostración</span></footer>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+</body>
+</html>
