@@ -1,242 +1,199 @@
-# TRAZA+ | Seguimiento de pedidos de grifería
+# TRAZA+ | Seguimiento y trazabilidad de pedidos de grifería
 
-Prototipo web para consultar el recorrido de pedidos, productos y unidades de manipulación dentro del centro de distribución. La aplicación está construida con Python y Flask en el backend y HTML, CSS y JavaScript en la interfaz.
+**Solución web para el seguimiento de pedidos dentro del centro de distribución** 
+**Área:** Operaciones y Logística 
+**Empresa:** Corona 
+**Sistema de gestión de almacén de referencia:** SAP Extended Warehouse Management (SAP EWM) 
 
-## Qué incluye
 
-- Inicio con resumen de pedidos y distribución por etapa.
-- Búsqueda por pedido, entrega, referencia de producto o HU.
-- Detalle de pedido con productos, unidades de manipulación, ubicación registrada y eventos.
-- Alertas de permanencia superiores a umbrales configurados.
-- Módulo de informes y consultas con IA (requiere autorización y configuración).
-- Panel de conexión de SAP EWM con comprobación y consulta de solo lectura.
-- Modo de demostración claramente identificado.
+---
 
-## Estado de la integración
+## 1. Presentación de la solución
 
-La aplicación **no queda conectada automáticamente a SAP EWM**. La conexión se habilita solo cuando TI facilite y autorice el endpoint, la autenticación, el esquema de respuesta y las condiciones de red.
+TRAZA+ es una aplicación web diseñada para facilitar el seguimiento de los pedidos de productos de grifería durante su recorrido dentro del centro de distribución. Su propósito es ofrecer al personal de operación y supervisión una vista clara del estado de cada pedido, los productos que lo componen, las unidades de manipulación relacionadas y la última ubicación registrada en cada etapa del proceso.
 
-El conector no presupone una URL OData específica. La versión y configuración de EWM deben confirmarse con TI. El código espera una respuesta JSON normalizada descrita en la sección **Contrato de datos esperado**. Si la API corporativa devuelve otra estructura, debe ajustarse el mapeo antes de utilizarla.
+La solución está centrada en **SAP EWM como fuente principal de información logística**. El seguimiento contempla las actividades de picking, empaque, traslado a la zona de despacho, asignación de puerta, cargue y salida del centro de distribución, de acuerdo con los eventos y estados disponibles en la fuente.
 
-Los datos de demostración son inventados y están identificados como tales. No representan registros ni tiempos reales de Corona.
+La aplicación reúne la información en una interfaz de consulta sencilla, de modo que el usuario pueda localizar un pedido y revisar su avance sin navegar por diferentes pantallas del sistema de origen. TRAZA+ tiene un enfoque informativo: facilita la consulta y el análisis del recorrido, sin ejecutar movimientos ni modificar documentos operativos en SAP EWM.
 
-## Requisitos
+## 2. Propósito y beneficios operativos
 
-- Python 3.10 o superior.
-- Visual Studio Code (recomendado).
-- Acceso a una terminal (PowerShell o CMD en Windows).
+La solución busca mejorar la visibilidad del proceso de despacho dentro del centro de distribución. Su utilización permite:
 
-## Instalación en Windows
+- Consultar en qué etapa se encuentra un pedido.
+- Revisar los productos y cantidades asociados a cada pedido.
+- Consultar las unidades de manipulación, cuando estén relacionadas con el pedido.
+- Identificar la última ubicación registrada y revisar el historial de eventos.
+- Visualizar los tiempos de permanencia y reconocer pedidos que requieren revisión.
+- Contar con una vista resumida de la operación para facilitar el seguimiento por parte de los responsables.
 
-1. Descomprime el proyecto y abre la carpeta `traza_pedidos_sap_ewm` en Visual Studio Code.
-2. Abre la terminal integrada.
-3. Crea un entorno virtual:
+## 3. Módulos de la aplicación
 
-```powershell
-py -m venv .venv
-```
+| Módulo | Funcionalidad |
+|---|---|
+| **Inicio** | Presenta indicadores generales de pedidos, pedidos despachados, pedidos en proceso y pedidos con tiempos que requieren revisión. Incluye una distribución por etapa para facilitar la lectura del estado de la operación. |
+| **Seguimiento de pedidos** | Permite buscar pedidos mediante su identificador y otros datos relacionados disponibles, como documento de entrega o referencia de producto. Presenta los resultados y su etapa actual. |
+| **Detalle del pedido** | Muestra la información general del pedido, sus productos, cantidades, unidades de manipulación, ubicación reportada y recorrido cronológico. |
+| **Recorrido y trazabilidad** | Organiza los eventos registrados para mostrar el avance del pedido por las etapas logísticas y la última ubicación informada. |
+| **Alertas y demoras** | Identifica pedidos cuyo tiempo de permanencia supera los límites configurados para una etapa. Las alertas orientan la revisión operativa y no sustituyen la verificación del responsable. |
+| **Conexión SAP EWM** | Incluye el estado de la configuración de conexión y las acciones de verificación y consulta disponibles en el conector. |
+| **Informes con IA** | Se contempla como ampliación futura para generar informes, responder preguntas sobre la operación y resumir patrones de demora. |
 
-4. Actívalo en PowerShell:
+## 4. Alcance de la trazabilidad
 
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
+TRAZA+ contempla dos niveles de consulta complementarios:
 
-Si utilizas CMD:
+### 4.1 Seguimiento del pedido
 
-```bat
-.venv\Scripts\activate.bat
-```
+Permite consultar el estado general del documento de salida y visualizar su avance dentro del centro de distribución. El recorrido de presentación contempla las siguientes etapas, sujetas a la disponibilidad y correspondencia de eventos en SAP EWM:
 
-5. Instala las dependencias:
+1. Registro del pedido.
+2. Picking.
+3. Empaque.
+4. Zona de despacho o *staging*.
+5. Puerta de embarque.
+6. Cargue.
+7. Salida del centro de distribución.
 
-```powershell
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
+### 4.2 Seguimiento de productos y unidades de manipulación
 
-6. Ejecuta la aplicación:
+Dentro del detalle del pedido se pueden consultar las referencias, descripciones y cantidades de los productos. Cuando la fuente proporciona la relación correspondiente, también se presentan las unidades de manipulación, su estado, contenido y ubicación registrada.
 
-```powershell
-python app.py
-```
+Un pedido puede incluir varios productos y unidades de manipulación. Estos elementos no necesariamente avanzan al mismo tiempo; por eso, el estado general del pedido debe interpretarse junto con el detalle disponible de sus productos y unidades de manipulación.
 
-7. Abre esta dirección en tu navegador:
+### 4.3 Ubicaciones y eventos
+
+La ubicación que presenta la aplicación corresponde al último registro recibido de la fuente. El historial muestra los eventos con la fecha y hora disponibles, la actividad o etapa y la ubicación reportada. La visualización no representa geolocalización física en tiempo real: depende de los registros y de la frecuencia de actualización del origen de datos.
+
+## 5. Experiencia de usuario y navegación
+
+La interfaz mantiene una identidad visual basada en los tonos corporativos azul oscuro y azul claro. La navegación se organiza mediante un menú lateral con acceso directo a los módulos principales.
+
+El flujo de uso previsto es sencillo:
+
+1. El usuario ingresa al resumen general para revisar la actividad de los pedidos.
+2. Accede a **Seguimiento de pedidos** y busca el pedido que necesita consultar.
+3. Abre el detalle para revisar productos, cantidades y estado general.
+4. Consulta el recorrido para identificar los eventos y la última ubicación registrada.
+5. Revisa **Alertas y demoras** para priorizar los pedidos que requieren atención.
+
+## 6. Arquitectura tecnológica
+
+La aplicación utiliza una arquitectura web en la que la interfaz presenta la información y el backend gestiona las consultas, el procesamiento y la comunicación con los servicios externos.
 
 ```text
-http://127.0.0.1:5000
+Usuario
+ │
+ ▼
+Interfaz web
+HTML · CSS · JavaScript
+ │
+ ▼
+Backend de aplicación
+Python · Flask
+ │
+ ├── Gestión de pedidos y productos
+ ├── Organización de eventos y ubicaciones
+ ├── Cálculo de tiempos y alertas
+ │
+ ▼
+Conector de consulta
+SAP EWM
 ```
 
-La aplicación abrirá en modo demostración. No necesita credenciales para mostrar las pantallas de ejemplo.
+### 6.1 Tecnologías
 
-## Cómo utilizar la aplicación
+| Tecnología | Uso dentro de TRAZA+ |
+|---|---|
+| **Python** | Procesamiento de la información de pedidos, productos, unidades de manipulación, eventos y tiempos. |
+| **Flask** | Gestión de las rutas de la aplicación y comunicación entre la interfaz y la lógica del sistema. |
+| **HTML** | Estructura de las pantallas y organización de los elementos de consulta. |
+| **CSS** | Presentación visual, identidad de color, distribución de componentes y adaptación de la interfaz. |
+| **JavaScript** | Navegación, búsquedas, filtros, solicitudes al backend y actualización de los resultados en pantalla. |
+| **Requests** | Comunicación HTTP desde el backend con el servicio de consulta configurado para SAP EWM. |
+| **python-dotenv** | Lectura de parámetros de configuración definidos para el entorno de ejecución. |
+| **Gunicorn** | Servidor WSGI para entornos Linux compatibles. |
 
-1. En **Inicio**, revisa el resumen de pedidos y su distribución por etapa.
-2. En **Seguimiento de pedidos**, busca por número de pedido, entrega, referencia o identificador HU.
-3. Selecciona **Ver detalle** para revisar productos, unidades de manipulación, ubicación registrada e historial de eventos.
-4. En **Alertas y demoras**, revisa los pedidos que exceden los límites configurados. Los valores del modo demostración son solo ilustrativos.
-5. En **Informes con IA**, usa generación de informes, preguntas o análisis de demoras una vez que la empresa autorice y configure el servicio.
-6. En **Conexión SAP EWM**, revisa el estado de la integración y ejecuta las pruebas cuando TI entregue la configuración.
+## 7. Fuente de información: SAP EWM
 
-## Configuración de SAP EWM
+SAP EWM es la fuente principal considerada para la trazabilidad logística. La aplicación dispone de un conector de consulta HTTP de solo lectura, preparado para recibir los datos de pedidos y organizarlos en la estructura que utiliza la interfaz.
 
-1. Copia `.env.example` y crea un archivo local llamado `.env` en la raíz del proyecto.
-2. Solicita a TI los endpoints de consulta, el método de autenticación, los permisos de solo lectura, los certificados y el contrato de datos.
-3. Completa solo las variables que TI haya confirmado. No inventes las rutas del servicio.
-4. Cuando exista autorización y configuración completa, cambia `EWM_ENABLED=false` a `EWM_ENABLED=true`.
-5. Reinicia Flask y utiliza **Verificar conexión**.
-6. Luego utiliza **Consultar pedidos de SAP EWM** y contrasta los resultados con un pedido autorizado en SAP GUI.
+El entorno de referencia identificado durante la revisión en SAP GUI es **PS4, mandante 100**, con el monitor de almacén `/SCWM/MON` y número de almacén **MD01**. Esta identificación corresponde al contexto de acceso observado en SAP GUI.
 
-Variables disponibles:
+La aplicación diferencia los registros recibidos desde SAP EWM de los datos de demostración que se utilizan para revisar la interfaz. La consulta de información corporativa requiere que el conector tenga configurado el servicio autorizado por la compañía. Cuando se utiliza el modo de demostración, los registros que aparecen en pantalla se identifican como información ilustrativa y no como datos reales de SAP EWM.
 
-```env
-EWM_ENABLED=false
-EWM_ORDERS_URL=
-EWM_HEALTH_URL=
-EWM_AUTH_TYPE=none
-EWM_API_TOKEN=
-EWM_USERNAME=
-EWM_PASSWORD=
-EWM_CA_BUNDLE=
-EWM_TIMEOUT_SECONDS=15
-```
+El conector realiza solicitudes de consulta y no confirma tareas, modifica pedidos ni ejecuta movimientos en el sistema de origen.
 
-`EWM_AUTH_TYPE` admite `none`, `bearer` o `basic` en esta versión. Si la empresa utiliza OAuth con flujo de obtención de token, SSO, certificados de cliente u otro mecanismo, TI debe definir el ajuste del conector. La validación TLS permanece activada.
+## 8. Gestión de tiempos y alertas
 
-### Contrato JSON esperado
+La aplicación calcula el tiempo transcurrido en una etapa a partir de la marca de tiempo de inicio disponible. Cuando se configuran límites por etapa, el sistema compara el tiempo calculado con el valor establecido y presenta los pedidos que superan ese umbral.
 
-El conector acepta una lista JSON directa o un objeto que incluya `orders` (también admite algunos envoltorios OData comunes). Cada pedido debe entregarse con campos equivalentes a este ejemplo:
+Los límites de permanencia deben corresponder a los criterios operativos definidos para cada actividad. Una alerta indica que un pedido requiere revisión; no determina por sí sola la causa de la demora ni confirma que la mercancía se encuentre físicamente detenida.
 
-```json
-{
-  "orders": [
-    {
-      "order_id": "ID_PEDIDO",
-      "delivery_id": "ID_ENTREGA",
-      "created_at": "2026-11-23T08:00:00Z",
-      "status": "En proceso",
-      "stage": "Picking",
-      "stage_started_at": "2026-11-23T08:20:00Z",
-      "location": "UBICACION_REGISTRADA",
-      "items": [
-        {
-          "reference": "REFERENCIA_PRODUCTO",
-          "description": "Descripción",
-          "quantity": 2,
-          "unit": "UN"
-        }
-      ],
-      "handling_units": [
-        {
-          "hu_id": "ID_HU",
-          "location": "UBICACION_HU",
-          "status": "Estado HU",
-          "contents": "Contenido"
-        }
-      ],
-      "events": [
-        {
-          "event_time": "2026-11-23T08:20:00Z",
-          "event": "Tarea de picking iniciada",
-          "stage": "Picking",
-          "location": "UBICACION_REGISTRADA",
-          "status": "En proceso"
-        }
-      ]
-    }
-  ]
-}
-```
+Si no se dispone de una fecha de inicio válida o del umbral correspondiente, la aplicación no debe presentar un tiempo de permanencia como si estuviera confirmado.
 
-Este JSON es un **contrato de adaptación para el prototipo**, no una muestra de la respuesta real de SAP EWM. Los nombres de campos y relaciones deben mapearse a partir de la documentación y respuesta de la API corporativa. La etapa `stage` no debe inferirse si SAP no entrega un dato suficiente para establecerla.
+## 9. Ampliación futura: inteligencia artificial
 
-## Tiempos y alertas
+Como evolución de TRAZA+, se proyecta incorporar un módulo de inteligencia artificial para apoyar la elaboración y consulta de información operativa. Esta ampliación permitirá:
 
-En el modo de demostración se utilizan límites ilustrativos para mostrar cómo funciona el panel. En modo SAP EWM las alertas permanecen sin configurar hasta que Operaciones confirme los límites y se definan estas variables:
+- **Generar informes:** preparar resúmenes diarios, semanales o por pedido a partir de los registros disponibles.
+- **Responder preguntas:** facilitar consultas en lenguaje natural, por ejemplo, qué pedidos llevan más tiempo en empaque o cuáles están pendientes de cargue.
+- **Analizar demoras:** resumir las etapas con mayor concentración de alertas y presentar observaciones para revisión.
 
-```env
-SLA_PICKING_MINUTES=
-SLA_EMPAQUE_MINUTES=
-SLA_STAGING_MINUTES=
-SLA_LOADING_MINUTES=
-```
+La inteligencia artificial tendrá una función de apoyo: los estados, cantidades y tiempos serán obtenidos y calculados por la aplicación. La IA se utilizará para redactar y explicar los resultados, sin modificar pedidos ni ejecutar operaciones en SAP EWM. Su incorporación se realizará como una ampliación futura, de acuerdo con las políticas corporativas para el uso de servicios de IA y datos empresariales.
 
-El tiempo se calcula desde `stage_started_at`. Si SAP EWM no registra la hora de inicio o las marcas de tiempo necesarias, no será posible calcular la permanencia con fiabilidad.
-
-## Configuración de inteligencia artificial
-
-El módulo utiliza la Responses API y permanece desactivado por defecto. Antes de enviar información a un proveedor externo, la empresa debe aprobar expresamente el tratamiento de datos y definir el proveedor, modelo, credenciales y reglas de seguridad.
-
-Solo después de esa aprobación se configuran las siguientes variables en el entorno seguro del servidor:
-
-```env
-AI_ENABLED=true
-AI_DATA_APPROVED=true
-OPENAI_API_KEY=CLAVE_ENTREGADA_POR_EL_ADMINISTRADOR
-OPENAI_MODEL=MODELO_APROBADO_POR_TI
-```
-
-No incluyas claves en archivos compartidos, capturas o repositorios. No subas `.env` a GitHub. El servicio recibe campos logísticos resumidos y excluye el nombre del cliente; aun así, los identificadores y demás datos operativos solo deben enviarse con autorización corporativa.
-
-Si la empresa selecciona otro proveedor o una plataforma interna, debe sustituirse el adaptador `services/ai_service.py` por el conector aprobado.
-
-## Endpoints internos de la aplicación
-
-| Método | Ruta | Función |
-|---|---|---|
-| GET | `/` | Interfaz principal |
-| GET | `/api/health` | Estado básico de la aplicación |
-| GET | `/api/summary` | Indicadores del conjunto actual |
-| GET | `/api/orders` | Búsqueda y listado de pedidos |
-| GET | `/api/orders/<order_id>` | Detalle de pedido |
-| GET | `/api/alerts` | Alertas calculadas |
-| GET | `/api/integration/status` | Estado de configuración EWM |
-| POST | `/api/integration/check` | Verificación del endpoint configurado |
-| POST | `/api/integration/refresh` | Consulta y actualización de pedidos |
-| GET | `/api/ai/status` | Estado de configuración IA |
-| POST | `/api/ai/report` | Generar informe |
-| POST | `/api/ai/ask` | Preguntar sobre datos disponibles |
-| POST | `/api/ai/delays` | Analizar alertas y demoras |
-
-Las rutas `/api/...` son endpoints internos de esta aplicación, no URLs de SAP.
-
-## Estructura del proyecto
+## 10. Estructura del proyecto
 
 ```text
 traza_pedidos_sap_ewm/
-├── app.py
-├── requirements.txt
-├── .env.example
-├── .gitignore
-├── README.md
+├── app.py # Aplicación Flask y rutas del sistema
+├── requirements.txt # Dependencias del proyecto
+├──.env.example # Plantilla de configuración
+├──.gitignore # Exclusión de archivos locales y secretos
+├── README.md # Documentación de la solución
+├── INICIAR_EN_WINDOWS.bat # Inicio local en Windows
 ├── services/
-│   ├── __init__.py
-│   ├── ewm_connector.py
-│   └── ai_service.py
+│ ├── __init__.py
+│ ├── ewm_connector.py # Conector de consulta SAP EWM
+│ └── ai_service.py # Servicio preparado para la ampliación de IA
 ├── templates/
-│   └── index.html
+│ └── index.html # Interfaz web principal
 └── static/
-    ├── css/styles.css
-    └── js/app.js
+ ├── css/
+ │ └── styles.css # Estilos y diseño visual
+ └── js/
+ └── app.js # Navegación e interacción de la interfaz
 ```
 
-## Seguridad y limitaciones
+## 11. Seguridad y uso de la información
 
-- La conexión EWM realiza solicitudes GET; no ejecuta cambios en SAP.
-- No se deben utilizar endpoints o credenciales sin autorización de TI.
-- No se deben poner contraseñas ni tokens en HTML, JavaScript o GitHub.
-- La conexión puede requerir red interna, VPN, API Gateway o infraestructura aprobada por TI.
-- La integración se valida en un ambiente no productivo siempre que la empresa lo disponga.
-- La última ubicación mostrada es la última informada por la fuente, no una confirmación física en tiempo real.
-- El prototipo mantiene los pedidos consultados en memoria; el almacenamiento persistente y la gestión de usuarios deben definirse antes de cualquier uso operativo.
-- No se debe publicar la aplicación con información interna sin autenticación, autorización y revisión de seguridad.
-- Una respuesta HTTP exitosa no prueba por sí sola que los campos, estados o relaciones estén correctamente interpretados.
+- Las credenciales y los tokens de conexión se administran mediante variables de entorno y no deben incorporarse al código fuente ni al repositorio.
+- El archivo `.env` se mantiene fuera del control de versiones; se comparte únicamente la plantilla `.env.example` sin secretos.
+- La conexión con SAP EWM se limita a operaciones de consulta desde el backend.
+- Los datos empresariales deben utilizarse únicamente en entornos y servicios aprobados por la compañía.
+- La ubicación presentada corresponde al último registro recibido y debe interpretarse de acuerdo con la fecha de actualización.
+- Antes de habilitar el acceso compartido o productivo, la publicación debe respetar los controles corporativos de autenticación, autorización y protección de información.
 
-## Despliegue
+## 12. Puesta en marcha y soporte
 
-Para un servicio Linux compatible con Gunicorn:
+La aplicación se ejecuta como un servicio web desarrollado con Flask. Las dependencias se encuentran declaradas en `requirements.txt` y la configuración del entorno se documenta en `.env.example`.
 
-- Build command: `pip install -r requirements.txt`
-- Start command: `gunicorn app:app`
+Para la operación local, el servicio se inicia desde el entorno Python del proyecto y la interfaz se consulta desde el navegador en la dirección local configurada. En un entorno corporativo, la publicación y el acceso deben ajustarse a la infraestructura y a los controles de la compañía.
 
-No se debe desplegar con datos internos hasta que TI apruebe el entorno de alojamiento y su conectividad con SAP EWM.
+La estructura del proyecto permite mantener por separado la interfaz, la lógica de procesamiento y el conector de SAP EWM, facilitando el mantenimiento y la evolución de la solución.
+
+---
+
+## Control del documento
+
+| Campo | Descripción |
+|---|---|
+| **Nombre de la solución** | TRAZA+ – Seguimiento y trazabilidad de pedidos de grifería |
+| **Área** | Operaciones y Logística |
+| **Proceso** | Seguimiento interno de pedidos en el centro de distribución |
+| **Fuente principal** | SAP EWM |
+| **Tecnología principal** | Python y Flask |
+| **Interfaz** | HTML, CSS y JavaScript |
+| **Ampliación futura** | Inteligencia artificial para informes y análisis operativo |
+
+**TRAZA+ – Visibilidad del recorrido de los pedidos dentro del centro de distribución.**
