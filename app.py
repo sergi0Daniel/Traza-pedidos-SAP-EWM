@@ -108,8 +108,8 @@ def build_demo_orders() -> list[dict[str, Any]]:
         make_demo_order(
             "PD-45873", "Empaque", 165, refs,
             [
-                {"hu_id": "HU-DEMO-87321", "location": "EM-01", "status": "En empaque", "contents": "REF. 799860001 · 2 UN"},
-                {"hu_id": "HU-DEMO-87322", "location": "EM-02", "status": "En empaque", "contents": "REF. O24380001 · 1 UN"},
+                {"hu_id": "DT-DEMO-87321", "location": "EM-01", "status": "En empaque", "contents": "REF. 799860001 · 2 UN"},
+                {"hu_id": "DT-DEMO-87322", "location": "EM-02", "status": "En empaque", "contents": "REF. O24380001 · 1 UN"},
             ],
             [(0, "Pedido registrado", "Pedido registrado", "Recepción de pedidos"),
              (35, "Picking iniciado", "Picking", "PK-03"),
@@ -119,7 +119,7 @@ def build_demo_orders() -> list[dict[str, Any]]:
         make_demo_order(
             "PD-45874", "Picking", 72,
             [{"reference": "REF. 799860001", "description": "Grifería para lavamanos", "quantity": 4, "unit": "UN"}],
-            [{"hu_id": "HU-DEMO-87411", "location": "PK-03", "status": "Pendiente de empaque", "contents": "4 unidades"}],
+            [{"hu_id": "DT-DEMO-87411", "location": "PK-03", "status": "Pendiente de empaque", "contents": "4 unidades"}],
             [(0, "Pedido registrado", "Pedido registrado", "Recepción de pedidos"),
              (30, "Picking iniciado", "Picking", "PK-03")],
             "Zona de picking PK-03", "Cliente de demostración B", "ENT-DEMO-45874",
@@ -127,7 +127,7 @@ def build_demo_orders() -> list[dict[str, Any]]:
         make_demo_order(
             "PD-45798", "Zona de despacho", 130,
             [{"reference": "REF. O24380001", "description": "Grifería para ducha", "quantity": 3, "unit": "UN"}],
-            [{"hu_id": "HU-DEMO-79811", "location": "ST-02", "status": "En espera de cargue", "contents": "3 unidades"}],
+            [{"hu_id": "DT-DEMO-79811", "location": "ST-02", "status": "En espera de cargue", "contents": "3 unidades"}],
             [(0, "Pedido registrado", "Pedido registrado", "Recepción de pedidos"),
              (25, "Picking confirmado", "Picking finalizado", "PK-01"),
              (60, "Empaque confirmado", "Empaque finalizado", "EM-02"),
@@ -137,7 +137,7 @@ def build_demo_orders() -> list[dict[str, Any]]:
         make_demo_order(
             "PD-45795", "Cargue", 65,
             [{"reference": "REF. 799860001", "description": "Grifería para lavamanos", "quantity": 1, "unit": "UN"}],
-            [{"hu_id": "HU-DEMO-79501", "location": "PU-03", "status": "En cargue", "contents": "1 unidad"}],
+            [{"hu_id": "DT-DEMO-79501", "location": "PU-03", "status": "En cargue", "contents": "1 unidad"}],
             [(0, "Pedido registrado", "Pedido registrado", "Recepción de pedidos"),
              (25, "Picking confirmado", "Picking finalizado", "PK-02"),
              (45, "Empaque confirmado", "Empaque finalizado", "EM-01"),
@@ -149,7 +149,7 @@ def build_demo_orders() -> list[dict[str, Any]]:
             "PD-45763", "Empaque", 125,
             [{"reference": "REF. 799860001", "description": "Grifería para lavamanos", "quantity": 2, "unit": "UN"},
              {"reference": "REF. O24380001", "description": "Grifería para ducha", "quantity": 2, "unit": "UN"}],
-            [{"hu_id": "HU-DEMO-76301", "location": "EM-02", "status": "En empaque", "contents": "2 unidades"}],
+            [{"hu_id": "DT-DEMO-76301", "location": "EM-02", "status": "En empaque", "contents": "2 unidades"}],
             [(0, "Pedido registrado", "Pedido registrado", "Recepción de pedidos"),
              (40, "Picking iniciado", "Picking", "PK-04"),
              (70, "Picking confirmado", "Picking finalizado", "PK-04")],

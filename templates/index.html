@@ -80,11 +80,11 @@
         <div class="page-heading"><div><div class="eyebrow">CONSULTA OPERATIVA</div><h1>Seguimiento de pedidos</h1><p>Busca un pedido y consulta su etapa, ubicación y productos asociados.</p></div></div>
         <article class="panel search-panel">
           <form id="orderSearchForm" class="search-form">
-            <label class="search-box"><span>⌕</span><input id="orderSearch" type="search" placeholder="Número de pedido, entrega, referencia o HU" autocomplete="off"></label>
+            <label class="search-box"><span>⌕</span><input id="orderSearch" type="search" placeholder="Número de pedido, entrega, referencia o DT" autocomplete="off"></label>
             <select id="stageFilter" aria-label="Filtrar por etapa"><option value="">Todas las etapas</option><option>Picking</option><option>Empaque</option><option>Zona de despacho</option><option>Puerta de embarque</option><option>Cargue</option><option>Despachado</option></select>
             <button class="btn btn-primary" type="submit">Buscar pedidos</button>
           </form>
-          <div class="filter-hint">Puedes buscar por número de pedido, documento de entrega, referencia del producto o identificador HU cuando esté disponible.</div>
+          <div class="filter-hint">Puedes buscar por número de pedido, documento de entrega, referencia del producto o identificador DT cuando esté disponible.</div>
         </article>
         <article class="panel orders-panel">
           <div class="panel-heading"><div><h2>Resultados de búsqueda</h2><p id="ordersCount">Pedidos disponibles</p></div><button class="text-link" id="clearFilters">Limpiar filtros</button></div>
@@ -147,7 +147,7 @@
           <div class="connection-buttons"><button class="btn btn-outline" id="checkEwm">Verificar conexión</button><button class="btn btn-primary" id="refreshEwm">Consultar pedidos de SAP EWM</button></div>
           <div id="ewmFeedback" class="feedback" role="status"></div>
         </article>
-        <article class="panel integration-steps"><h2>Información requerida para habilitar la conexión</h2><div class="requirements-grid"><div><span class="step-number">01</span><strong>Endpoint autorizado</strong><p>Dirección del servicio REST u OData definida por TI.</p></div><div><span class="step-number">02</span><strong>Autenticación</strong><p>Usuario técnico o mecanismo de autenticación aprobado.</p></div><div><span class="step-number">03</span><strong>Formato de datos</strong><p>Campos de pedido, posiciones, tareas, HU, eventos y ubicaciones.</p></div><div><span class="step-number">04</span><strong>Prueba controlada</strong><p>Validar un pedido autorizado y contrastar la respuesta con SAP EWM.</p></div></div></article>
+        <article class="panel integration-steps"><h2>Información requerida para habilitar la conexión</h2><div class="requirements-grid"><div><span class="step-number">01</span><strong>Endpoint autorizado</strong><p>Dirección del servicio REST u OData definida por TI.</p></div><div><span class="step-number">02</span><strong>Autenticación</strong><p>Usuario técnico o mecanismo de autenticación aprobado.</p></div><div><span class="step-number">03</span><strong>Formato de datos</strong><p>Campos de pedido, posiciones, tareas, DT, eventos y ubicaciones.</p></div><div><span class="step-number">04</span><strong>Prueba controlada</strong><p>Validar un pedido autorizado y contrastar la respuesta con SAP EWM.</p></div></div></article>
         <div class="security-note">Por seguridad, las credenciales se configuran en el entorno del servidor. No se introducen contraseñas ni tokens en esta pantalla o en el navegador.</div>
       </section>
     </div>

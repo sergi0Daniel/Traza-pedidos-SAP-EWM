@@ -181,7 +181,7 @@ function renderDetail(order) {
     <div class="detail-grid">
       <div class="detail-stat"><span>Fecha de creación</span><strong>${formatDate(order.created_at)}</strong></div>
       <div class="detail-stat"><span>Productos / referencias</span><strong>${(order.items || []).length}</strong></div>
-      <div class="detail-stat"><span>Unidades de manipulación</span><strong>${(order.handling_units || []).length} HU</strong></div>
+      <div class="detail-stat"><span>Unidades de manipulación</span><strong>${(order.handling_units || []).length} DT</strong></div>
       <div class="detail-stat"><span>Tiempo en etapa</span><strong>${formatMinutes(order.elapsed_minutes ?? stageMinutes(order))}</strong></div>
     </div>
     <div class="detail-top-grid">
@@ -196,7 +196,7 @@ function renderDetail(order) {
     </div>
     <div class="detail-lower-grid">
       <article class="panel"><h2 class="subsection-title">Productos del pedido</h2><div class="table-wrap"><table><thead><tr><th>Referencia</th><th>Descripción</th><th>Cantidad</th></tr></thead><tbody>${items}</tbody></table></div></article>
-      <article class="panel"><h2 class="subsection-title">Unidades de manipulación (HU)</h2><div class="table-wrap"><table><thead><tr><th>HU</th><th>Contenido</th><th>Ubicación</th><th>Estado</th></tr></thead><tbody>${hus}</tbody></table></div></article>
+      <article class="panel"><h2 class="subsection-title">Unidades de manipulación (DT)</h2><div class="table-wrap"><table><thead><tr><th>DT</th><th>Contenido</th><th>Ubicación</th><th>Estado</th></tr></thead><tbody>${hus}</tbody></table></div></article>
     </div>
     <article class="panel"><h2 class="subsection-title">Historial de movimientos</h2><div class="event-list">${eventRows}</div></article>
     ${alert ? `<div class="notice-banner" style="margin-top:15px">Atención: el tiempo de permanencia supera el límite configurado por ${formatMinutes(alert.overdue_minutes)}. Esta alerta requiere revisión operativa.</div>` : ''}
